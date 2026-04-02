@@ -1,0 +1,1900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BINGO NEXUS | Mobile Edition</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=JetBrains+Mono:wght@300;400;500&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        :root {
+            --deep-navy: #0a0e27;
+            --space-blue: #1a1f3a;
+            --violet: #8b5cf6;
+            --purple: #a78bfa;
+            --cyan: #06b6d4;
+            --teal: #14b8a6;
+            --pink: #ec4899;
+            --glass: rgba(139, 92, 246, 0.1);
+            --glass-border: rgba(167, 139, 250, 0.2);
+            --glow: rgba(139, 92, 246, 0.4);
+            --success: #10b981;
+            --warning: #f59e0b;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--deep-navy);
+            color: #e2e8f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        /* Animated Starfield Background */
+        #starfield {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        /* Main Container */
+        #app {
+            position: relative;
+            z-index: 1;
+            max-width: 100%;
+            padding: 1rem;
+            padding-top: 1rem;
+        }
+        
+        /* Header - Compact Mobile */
+        .header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            animation: fadeInDown 0.8s ease;
+        }
+        
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--violet), var(--cyan), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.3rem;
+            letter-spacing: 0.2rem;
+        }
+        
+        .header .subtitle {
+            font-size: 0.7rem;
+            color: var(--purple);
+            letter-spacing: 0.15rem;
+            text-transform: uppercase;
+        }
+        
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(26, 31, 58, 0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border);
+            padding: 0.5rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            flex: 1;
+            max-width: 80px;
+        }
+        
+        .nav-item.active {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+        }
+        
+        .nav-item .icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .nav-item .label {
+            font-size: 0.65rem;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+        
+        /* Sections */
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Glass Card */
+        .glass-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Buttons */
+        .btn {
+            font-family: 'Orbitron', sans-serif;
+            padding: 0.9rem 1.2rem;
+            font-size: 0.85rem;
+            margin: 0.3rem;
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--violet), var(--purple));
+            border: 1px solid var(--glass-border);
+            color: white;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            touch-action: manipulation;
+        }
+        
+        .btn:active {
+            transform: scale(0.95);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, var(--cyan), var(--teal));
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), var(--teal));
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+        }
+        
+        .btn-small {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.7rem;
+        }
+        
+        .btn-icon {
+            padding: 0.7rem;
+            width: auto;
+        }
+        
+        /* Number Pad */
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin: 1rem 0;
+        }
+        
+        .number-pad button {
+            aspect-ratio: 1;
+            font-size: 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+        }
+        
+        .number-display {
+            background: rgba(26, 31, 58, 0.8);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--violet);
+            margin-bottom: 1rem;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Bingo Cards - Mobile Optimized */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .bingo-card {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .bingo-card.winner {
+            border-color: var(--teal);
+            box-shadow: 0 0 30px rgba(20, 184, 166, 0.6);
+            animation: winnerPulse 2s infinite;
+        }
+        
+        @keyframes winnerPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            color: var(--violet);
+            font-weight: 700;
+            flex: 1;
+        }
+        
+        .card-title input {
+            background: transparent;
+            border: none;
+            color: var(--violet);
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            width: 100%;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+        }
+        
+        .cell {
+            aspect-ratio: 1;
+            background: rgba(26, 31, 58, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cell input {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: #e2e8f0;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .cell.free {
+            background: linear-gradient(135deg, var(--warning), #f59e0b);
+            border-color: var(--warning);
+        }
+        
+        .cell.free::before {
+            content: 'FREE';
+            position: absolute;
+            font-size: 0.5rem;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .cell.marked {
+            background: linear-gradient(135deg, var(--violet), var(--purple));
+            border-color: var(--violet);
+            box-shadow: 0 0 15px var(--glow);
+        }
+        
+        .cell.marked::after {
+            content: '✓';
+            position: absolute;
+            top: 2px;
+            right: 4px;
+            font-size: 0.7rem;
+            color: white;
+        }
+        
+        .card-stats {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.7rem;
+            color: var(--purple);
+        }
+        
+        /* Called Numbers */
+        .numbers-display {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 0.4rem;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .number-chip {
+            background: linear-gradient(135deg, var(--violet), var(--purple));
+            padding: 0.6rem;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            animation: chipAppear 0.3s ease;
+        }
+        
+        @keyframes chipAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        /* Camera Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 14, 39, 0.98);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: block;
+        }
+        
+        .modal-content {
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-header {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: var(--violet);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            text-align: center;
+        }
+        
+        /* Camera Interface */
+        #camera-container {
+            position: relative;
+            width: 100%;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #camera-preview {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 2px solid var(--glass-border);
+            touch-action: none;
+        }
+        
+        #camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .grid-overlay svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .corner-handle {
+            fill: var(--violet);
+            stroke: white;
+            stroke-width: 3;
+            cursor: grab;
+            pointer-events: all;
+            filter: drop-shadow(0 0 10px var(--glow));
+        }
+        
+        .corner-handle:active {
+            cursor: grabbing;
+            fill: var(--cyan);
+        }
+        
+        /* Camera Controls */
+        .camera-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .camera-controls label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .camera-controls input[type="range"] {
+            flex: 1;
+            accent-color: var(--violet);
+        }
+        
+        .camera-controls button {
+            flex: 1;
+        }
+        
+        /* OCR Progress */
+        .ocr-progress {
+            margin-top: 1rem;
+        }
+        
+        .progress-bar {
+            background: rgba(26, 31, 58, 0.8);
+            border-radius: 20px;
+            height: 40px;
+            overflow: hidden;
+            border: 1px solid var(--glass-border);
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--violet), var(--cyan));
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        
+        /* Cell Preview */
+        .cells-preview {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.3rem;
+            margin: 1rem 0;
+        }
+        
+        .preview-cell {
+            aspect-ratio: 1;
+            border: 1px solid var(--glass-border);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .preview-cell img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .preview-cell .preview-number {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(139, 92, 246, 0.9);
+            color: white;
+            text-align: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2rem;
+        }
+        
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+        }
+        
+        .stat-card {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            color: var(--violet);
+        }
+        
+        .stat-label {
+            font-size: 0.7rem;
+            color: var(--purple);
+            margin-top: 0.3rem;
+        }
+        
+        /* Game Mode Toggle */
+        .mode-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+        
+        .mode-option {
+            padding: 0.8rem;
+            background: rgba(26, 31, 58, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.75rem;
+            text-align: center;
+        }
+        
+        .mode-option.active {
+            background: linear-gradient(135deg, var(--violet), var(--purple));
+            border-color: var(--violet);
+            color: white;
+            box-shadow: 0 0 20px var(--glow);
+        }
+        
+        /* Results */
+        .results-list {
+            list-style: none;
+        }
+        
+        .results-list li {
+            background: linear-gradient(135deg, var(--teal), var(--cyan));
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 600;
+            animation: resultAppear 0.5s ease;
+            font-size: 0.85rem;
+        }
+        
+        @keyframes resultAppear {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        /* Winner Celebration */
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3000;
+            text-align: center;
+            pointer-events: none;
+        }
+        
+        .celebration-text {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--violet), var(--cyan), var(--pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: celebrationBounce 0.6s ease;
+        }
+        
+        @keyframes celebrationBounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        /* Import/Export */
+        .import-export-section {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .import-export-section button {
+            flex: 1;
+        }
+        
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--space-blue);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--violet);
+            border-radius: 4px;
+        }
+        
+        /* Loading Spinner */
+        .spinner {
+            border: 3px solid var(--glass-border);
+            border-top: 3px solid var(--violet);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--space-blue);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85rem;
+            z-index: 3000;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            animation: toastSlide 0.3s ease;
+        }
+        
+        @keyframes toastSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+        
+        .section-header {
+            font-family: 'Orbitron', sans-serif;
+            color: var(--violet);
+            margin: 1.5rem 0 1rem;
+            font-size: 1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <!-- Starfield Canvas -->
+    <canvas id="starfield"></canvas>
+    
+    <!-- Main App -->
+    <div id="app">
+        <!-- Header -->
+        <div class="header">
+            <h1>BINGO NEXUS</h1>
+            <div class="subtitle">Mobile Edition</div>
+        </div>
+        
+        <!-- PLAY Section -->
+        <div class="section active" id="play-section">
+            <div class="glass-card">
+                <div class="number-display" id="current-number">--</div>
+                
+                <div class="number-pad">
+                    <button class="btn" onclick="numberPadInput(1)">1</button>
+                    <button class="btn" onclick="numberPadInput(2)">2</button>
+                    <button class="btn" onclick="numberPadInput(3)">3</button>
+                    <button class="btn" onclick="numberPadInput(4)">4</button>
+                    <button class="btn" onclick="numberPadInput(5)">5</button>
+                    <button class="btn" onclick="numberPadInput(6)">6</button>
+                    <button class="btn" onclick="numberPadInput(7)">7</button>
+                    <button class="btn" onclick="numberPadInput(8)">8</button>
+                    <button class="btn" onclick="numberPadInput(9)">9</button>
+                    <button class="btn btn-danger" onclick="numberPadClear()">C</button>
+                    <button class="btn" onclick="numberPadInput(0)">0</button>
+                    <button class="btn btn-secondary" onclick="numberPadBackspace()">⌫</button>
+                </div>
+                
+                <button class="btn btn-success" onclick="callNumber()" style="margin-top: 0.5rem;">CALL NUMBER</button>
+                <button class="btn" onclick="undoNumber()">↶ UNDO LAST</button>
+            </div>
+            
+            <div class="glass-card">
+                <h4 class="section-header">Called Numbers</h4>
+                <div class="numbers-display" id="called-numbers"></div>
+            </div>
+        </div>
+        
+        <!-- CARDS Section -->
+        <div class="section" id="cards-section">
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                <button class="btn" onclick="addManualCard()">+ Manual</button>
+                <button class="btn btn-secondary" onclick="openCamera()">📷 Scan</button>
+                <button class="btn btn-secondary" onclick="uploadImage()">📁 Upload</button>
+            </div>
+            
+            <div class="cards-container" id="cards-container"></div>
+            
+            <div class="glass-card" id="results-section" style="display: none;">
+                <h4 class="section-header">🏆 Winners</h4>
+                <ul class="results-list" id="results-list"></ul>
+            </div>
+        </div>
+        
+        <!-- SETTINGS Section -->
+        <div class="section" id="settings-section">
+            <div class="glass-card">
+                <h4 class="section-header">Game Mode</h4>
+                <div class="mode-grid">
+                    <div class="mode-option active" data-mode="fullhouse" onclick="setGameMode('fullhouse')">Full House</div>
+                    <div class="mode-option" data-mode="onerow" onclick="setGameMode('onerow')">One Row</div>
+                    <div class="mode-option" data-mode="tworows" onclick="setGameMode('tworows')">Two Rows</div>
+                    <div class="mode-option" data-mode="corners" onclick="setGameMode('corners')">Corners</div>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <h4 class="section-header">Statistics</h4>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-cards">0</div>
+                        <div class="stat-label">Cards</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="numbers-called">0</div>
+                        <div class="stat-label">Called</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="winners-count">0</div>
+                        <div class="stat-label">Winners</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="closest-card">-</div>
+                        <div class="stat-label">Closest</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="glass-card">
+                <h4 class="section-header">Data Management</h4>
+                <div class="import-export-section">
+                    <button class="btn btn-secondary" onclick="exportGame()">💾 Export</button>
+                    <button class="btn btn-secondary" onclick="importGame()">📥 Import</button>
+                </div>
+                <button class="btn btn-danger" onclick="resetGame()" style="margin-top: 0.5rem;">🔄 Reset Game</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchSection('play')">
+            <div class="icon">🎮</div>
+            <div class="label">Play</div>
+        </div>
+        <div class="nav-item" onclick="switchSection('cards')">
+            <div class="icon">🎯</div>
+            <div class="label">Cards</div>
+        </div>
+        <div class="nav-item" onclick="switchSection('settings')">
+            <div class="icon">⚙️</div>
+            <div class="label">Settings</div>
+        </div>
+    </div>
+    
+    <!-- Camera Modal -->
+    <div class="modal" id="camera-modal">
+        <div class="modal-content">
+            <div class="modal-header">📷 SCAN BINGO CARD</div>
+            
+            <div id="camera-container">
+                <div id="camera-preview">
+                    <video id="camera-video" autoplay playsinline></video>
+                    <div class="grid-overlay" id="grid-overlay">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <!-- Grid lines -->
+                            <line x1="20" y1="20" x2="20" y2="80" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="40" y1="20" x2="40" y2="80" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="60" y1="20" x2="60" y2="80" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="80" y1="20" x2="80" y2="80" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="20" y1="20" x2="80" y2="20" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="20" y1="40" x2="80" y2="40" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="20" y1="60" x2="80" y2="60" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            <line x1="20" y1="80" x2="80" y2="80" stroke="var(--violet)" stroke-width="0.3" stroke-dasharray="1,1" opacity="0.5"/>
+                            
+                            <!-- Border -->
+                            <rect id="grid-rect" x="20" y="20" width="60" height="60" fill="none" stroke="var(--cyan)" stroke-width="1"/>
+                            
+                            <!-- Corner handles -->
+                            <circle class="corner-handle" id="corner-tl" cx="20" cy="20" r="4"/>
+                            <circle class="corner-handle" id="corner-tr" cx="80" cy="20" r="4"/>
+                            <circle class="corner-handle" id="corner-bl" cx="20" cy="80" r="4"/>
+                            <circle class="corner-handle" id="corner-br" cx="80" cy="80" r="4"/>
+                        </svg>
+                    </div>
+                </div>
+                
+                <div class="camera-controls">
+                    <label>
+                        <span>Brightness</span>
+                        <input type="range" id="brightness-slider" min="-100" max="100" value="0">
+                    </label>
+                    <label>
+                        <span>Contrast</span>
+                        <input type="range" id="contrast-slider" min="50" max="200" value="100">
+                    </label>
+                    <button class="btn btn-icon" id="flash-btn" onclick="toggleFlash()">💡</button>
+                </div>
+                
+                <div class="ocr-progress" id="ocr-progress" style="display: none;">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: 0%">0%</div>
+                    </div>
+                </div>
+                
+                <div id="cells-preview-container" style="display: none;">
+                    <h4 class="section-header">Preview & Confirm</h4>
+                    <div class="cells-preview" id="cells-preview"></div>
+                </div>
+                
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                    <button class="btn btn-success" id="capture-btn" onclick="captureAndProcess()">✓ Capture</button>
+                    <button class="btn btn-danger" onclick="closeCamera()">✕ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Hidden elements -->
+    <input type="file" id="file-input" accept="image/*" style="display: none;">
+    <input type="file" id="json-input" accept=".json" style="display: none;">
+    <canvas id="processing-canvas" style="display: none;"></canvas>
+    
+    <!-- Tesseract.js -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    
+    <script>
+        // ==================== GLOBAL STATE ====================
+        let bingoCards = [];
+        let calledNumbers = [];
+        let gameMode = 'fullhouse';
+        let cardIdCounter = 1;
+        let cameraStream = null;
+        let currentNumberInput = '';
+        let flashEnabled = false;
+        
+        // Grid corner positions (percentage)
+        let corners = {
+            tl: { x: 20, y: 20 },
+            tr: { x: 80, y: 20 },
+            bl: { x: 20, y: 80 },
+            br: { x: 80, y: 80 }
+        };
+        
+        let draggedCorner = null;
+        
+        // ==================== STARFIELD ANIMATION ====================
+        const canvas = document.getElementById('starfield');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const stars = [];
+        const starCount = 150;
+        
+        for (let i = 0; i < starCount; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 1.2,
+                velocity: Math.random() * 0.3 + 0.1,
+                opacity: Math.random()
+            });
+        }
+        
+        function animateStars() {
+            ctx.fillStyle = 'rgba(10, 14, 39, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            stars.forEach(star => {
+                star.y += star.velocity;
+                
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+                
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(167, 139, 250, ${star.opacity})`;
+                ctx.fill();
+            });
+            
+            requestAnimationFrame(animateStars);
+        }
+        
+        animateStars();
+        
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        
+        // ==================== NAVIGATION ====================
+        function switchSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            
+            document.getElementById(`${section}-section`).classList.add('active');
+            event.currentTarget.classList.add('active');
+            
+            if (section === 'settings') updateStats();
+        }
+        
+        // ==================== NUMBER PAD ====================
+        function numberPadInput(digit) {
+            if (currentNumberInput.length < 2) {
+                currentNumberInput += digit;
+                document.getElementById('current-number').textContent = currentNumberInput || '--';
+            }
+        }
+        
+        function numberPadBackspace() {
+            currentNumberInput = currentNumberInput.slice(0, -1);
+            document.getElementById('current-number').textContent = currentNumberInput || '--';
+        }
+        
+        function numberPadClear() {
+            currentNumberInput = '';
+            document.getElementById('current-number').textContent = '--';
+        }
+        
+        // ==================== CALL NUMBER ====================
+        function callNumber() {
+            const num = parseInt(currentNumberInput);
+            
+            if (!isNaN(num) && num >= 1 && num <= 75 && !calledNumbers.includes(num)) {
+                calledNumbers.push(num);
+                displayCalledNumber(num);
+                updateAllCards();
+                checkAllWinners();
+                updateStats();
+                playSound();
+                saveState();
+                numberPadClear();
+            } else if (calledNumbers.includes(num)) {
+                showToast('Number already called!');
+            } else if (num < 1 || num > 75) {
+                showToast('Number must be 1-75');
+            }
+        }
+        
+        function undoNumber() {
+            if (calledNumbers.length === 0) return;
+            
+            const lastNumber = calledNumbers.pop();
+            const chips = document.querySelectorAll('.number-chip');
+            if (chips.length > 0) {
+                chips[chips.length - 1].remove();
+            }
+            
+            updateAllCards();
+            checkAllWinners();
+            updateStats();
+            saveState();
+            showToast(`Undid number ${lastNumber}`);
+        }
+        
+        function displayCalledNumber(num) {
+            const container = document.getElementById('called-numbers');
+            const chip = document.createElement('div');
+            chip.className = 'number-chip';
+            chip.textContent = num;
+            container.appendChild(chip);
+            container.scrollTop = container.scrollHeight;
+        }
+        
+        // ==================== GAME MODE ====================
+        function setGameMode(mode) {
+            gameMode = mode;
+            document.querySelectorAll('.mode-option').forEach(o => o.classList.remove('active'));
+            document.querySelector(`.mode-option[data-mode="${mode}"]`).classList.add('active');
+            checkAllWinners();
+            saveState();
+        }
+        
+        // ==================== CARD MANAGEMENT ====================
+        function addManualCard() {
+            const card = {
+                id: cardIdCounter++,
+                name: `Card ${bingoCards.length + 1}`,
+                numbers: Array(25).fill(0),
+                isWinner: false
+            };
+            bingoCards.push(card);
+            renderCard(card);
+            updateStats();
+            saveState();
+            switchSection('cards');
+        }
+        
+        function renderCard(card) {
+            const container = document.getElementById('cards-container');
+            
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'bingo-card';
+            cardDiv.id = `card-${card.id}`;
+            
+            const header = document.createElement('div');
+            header.className = 'card-header';
+            
+            const title = document.createElement('div');
+            title.className = 'card-title';
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.value = card.name;
+            titleInput.addEventListener('input', (e) => {
+                card.name = e.target.value;
+                saveState();
+            });
+            title.appendChild(titleInput);
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'btn btn-small btn-danger btn-icon';
+            deleteBtn.textContent = '🗑';
+            deleteBtn.addEventListener('click', () => {
+                if (confirm('Delete this card?')) {
+                    bingoCards = bingoCards.filter(c => c.id !== card.id);
+                    cardDiv.remove();
+                    updateStats();
+                    saveState();
+                }
+            });
+            
+            header.appendChild(title);
+            header.appendChild(deleteBtn);
+            cardDiv.appendChild(header);
+            
+            const grid = document.createElement('div');
+            grid.className = 'card-grid';
+            
+            card.numbers.forEach((num, index) => {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                
+                // Center cell is FREE
+                if (index === 12) {
+                    cell.classList.add('free');
+                    cell.classList.add('marked');
+                    card.numbers[index] = -1; // Mark as FREE
+                } else {
+                    const input = document.createElement('input');
+                    input.type = 'number';
+                    input.value = num > 0 ? num : '';
+                    input.min = 1;
+                    input.max = 75;
+                    input.inputMode = 'numeric';
+                    
+                    input.addEventListener('input', (e) => {
+                        card.numbers[index] = parseInt(e.target.value) || 0;
+                        updateCardMarking(card);
+                        saveState();
+                    });
+                    
+                    cell.appendChild(input);
+                }
+                
+                grid.appendChild(cell);
+            });
+            
+            cardDiv.appendChild(grid);
+            
+            const stats = document.createElement('div');
+            stats.className = 'card-stats';
+            stats.innerHTML = `
+                <span>Marked: <span id="marked-${card.id}">0</span>/25</span>
+                <span>To Win: <span id="towin-${card.id}">25</span></span>
+            `;
+            cardDiv.appendChild(stats);
+            
+            container.appendChild(cardDiv);
+            updateCardMarking(card);
+        }
+        
+        function updateCardMarking(card) {
+            const cardDiv = document.getElementById(`card-${card.id}`);
+            if (!cardDiv) return;
+            
+            const cells = cardDiv.querySelectorAll('.cell');
+            let markedCount = 0;
+            
+            cells.forEach((cell, index) => {
+                // Skip FREE cell
+                if (index === 12) {
+                    markedCount++;
+                    return;
+                }
+                
+                const input = cell.querySelector('input');
+                if (!input) return;
+                
+                const num = parseInt(input.value) || 0;
+                
+                if (calledNumbers.includes(num) && num > 0) {
+                    cell.classList.add('marked');
+                    markedCount++;
+                } else {
+                    cell.classList.remove('marked');
+                }
+            });
+            
+            const markedSpan = document.getElementById(`marked-${card.id}`);
+            if (markedSpan) markedSpan.textContent = markedCount;
+            
+            const toWin = calculateNumbersToWin(card);
+            const toWinSpan = document.getElementById(`towin-${card.id}`);
+            if (toWinSpan) toWinSpan.textContent = toWin;
+        }
+        
+        function updateAllCards() {
+            bingoCards.forEach(card => {
+                updateCardMarking(card);
+            });
+        }
+        
+        function calculateNumbersToWin(card) {
+            const nums = card.numbers;
+            
+            if (gameMode === 'fullhouse') {
+                return nums.filter(n => !calledNumbers.includes(n) && n > 0).length;
+            }
+            
+            const lines = getWinningLines(nums);
+            let minToWin = Infinity;
+            
+            lines.forEach(line => {
+                const toWin = line.filter(n => !calledNumbers.includes(n) && n > 0 && n !== -1).length;
+                if (toWin < minToWin) minToWin = toWin;
+            });
+            
+            return minToWin === Infinity ? 0 : minToWin;
+        }
+        
+        function getWinningLines(nums) {
+            const lines = [];
+            
+            for (let i = 0; i < 5; i++) {
+                lines.push(nums.slice(i * 5, i * 5 + 5));
+            }
+            
+            for (let i = 0; i < 5; i++) {
+                lines.push([nums[i], nums[i+5], nums[i+10], nums[i+15], nums[i+20]]);
+            }
+            
+            lines.push([nums[0], nums[6], nums[12], nums[18], nums[24]]);
+            lines.push([nums[4], nums[8], nums[12], nums[16], nums[20]]);
+            
+            if (gameMode === 'corners') {
+                lines.push([nums[0], nums[4], nums[20], nums[24]]);
+            }
+            
+            return lines;
+        }
+        
+        function checkAllWinners() {
+            let newWinners = [];
+            
+            bingoCards.forEach(card => {
+                const wasWinner = card.isWinner;
+                const isWinner = checkWinner(card);
+                
+                if (isWinner && !wasWinner) {
+                    card.isWinner = true;
+                    const cardDiv = document.getElementById(`card-${card.id}`);
+                    if (cardDiv) cardDiv.classList.add('winner');
+                    newWinners.push(card);
+                    addWinnerToResults(card);
+                } else if (!isWinner && wasWinner) {
+                    card.isWinner = false;
+                    const cardDiv = document.getElementById(`card-${card.id}`);
+                    if (cardDiv) cardDiv.classList.remove('winner');
+                    removeWinnerFromResults(card);
+                }
+            });
+            
+            if (newWinners.length > 0) {
+                showCelebration();
+            }
+        }
+        
+        function checkWinner(card) {
+            const nums = card.numbers;
+            
+            if (gameMode === 'fullhouse') {
+                return nums.every(n => calledNumbers.includes(n) || n === 0 || n === -1);
+            }
+            
+            const lines = getWinningLines(nums);
+            
+            if (gameMode === 'onerow') {
+                return lines.some(line => line.every(n => calledNumbers.includes(n) || n === 0 || n === -1));
+            }
+            
+            if (gameMode === 'tworows') {
+                let rowCount = 0;
+                for (let i = 0; i < 5; i++) {
+                    const row = nums.slice(i * 5, i * 5 + 5);
+                    if (row.every(n => calledNumbers.includes(n) || n === 0 || n === -1)) {
+                        rowCount++;
+                    }
+                }
+                return rowCount >= 2;
+            }
+            
+            if (gameMode === 'corners') {
+                const corners = [nums[0], nums[4], nums[20], nums[24]];
+                return corners.every(n => calledNumbers.includes(n) || n === 0 || n === -1);
+            }
+            
+            return false;
+        }
+        
+        function addWinnerToResults(card) {
+            const resultsSection = document.getElementById('results-section');
+            resultsSection.style.display = 'block';
+            
+            const resultsList = document.getElementById('results-list');
+            const li = document.createElement('li');
+            li.id = `winner-${card.id}`;
+            li.textContent = `🏆 ${card.name} wins! (${calledNumbers.length} numbers)`;
+            resultsList.appendChild(li);
+        }
+        
+        function removeWinnerFromResults(card) {
+            const winnerItem = document.getElementById(`winner-${card.id}`);
+            if (winnerItem) winnerItem.remove();
+            
+            const resultsList = document.getElementById('results-list');
+            if (resultsList.children.length === 0) {
+                document.getElementById('results-section').style.display = 'none';
+            }
+        }
+        
+        function showCelebration() {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.innerHTML = '<div class="celebration-text">BINGO! 🎉</div>';
+            document.body.appendChild(celebration);
+            
+            navigator.vibrate && navigator.vibrate([200, 100, 200]);
+            
+            setTimeout(() => {
+                celebration.remove();
+            }, 2000);
+        }
+        
+        function updateStats() {
+            document.getElementById('total-cards').textContent = bingoCards.length;
+            document.getElementById('numbers-called').textContent = calledNumbers.length;
+            document.getElementById('winners-count').textContent = bingoCards.filter(c => c.isWinner).length;
+            
+            let minToWin = Infinity;
+            let closestCard = null;
+            
+            bingoCards.forEach(card => {
+                if (!card.isWinner) {
+                    const toWin = calculateNumbersToWin(card);
+                    if (toWin < minToWin) {
+                        minToWin = toWin;
+                        closestCard = card;
+                    }
+                }
+            });
+            
+            document.getElementById('closest-card').textContent = 
+                closestCard ? `${closestCard.name.substring(0, 8)} (${minToWin})` : '-';
+        }
+        
+        // ==================== CAMERA ====================
+        async function openCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        facingMode: 'environment',
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                };
+                
+                cameraStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const video = document.getElementById('camera-video');
+                video.srcObject = cameraStream;
+                
+                // Try to enable torch if available
+                const track = cameraStream.getVideoTracks()[0];
+                const capabilities = track.getCapabilities();
+                if (capabilities.torch) {
+                    document.getElementById('flash-btn').style.display = 'block';
+                }
+                
+                document.getElementById('camera-modal').classList.add('active');
+                
+            } catch (err) {
+                showToast('Camera access denied');
+                console.error(err);
+            }
+        }
+        
+        function closeCamera() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-modal').classList.remove('active');
+            document.getElementById('cells-preview-container').style.display = 'none';
+            document.getElementById('ocr-progress').style.display = 'none';
+        }
+        
+        function toggleFlash() {
+            if (!cameraStream) return;
+            
+            flashEnabled = !flashEnabled;
+            const track = cameraStream.getVideoTracks()[0];
+            
+            track.applyConstraints({
+                advanced: [{ torch: flashEnabled }]
+            }).catch(err => {
+                console.error('Flash not supported', err);
+            });
+            
+            document.getElementById('flash-btn').style.opacity = flashEnabled ? '1' : '0.5';
+        }
+        
+        // ==================== GRID DRAGGING ====================
+        const preview = document.getElementById('camera-preview');
+        
+        document.querySelectorAll('.corner-handle').forEach(handle => {
+            handle.addEventListener('mousedown', startDrag);
+            handle.addEventListener('touchstart', startDrag);
+        });
+        
+        function startDrag(e) {
+            e.preventDefault();
+            draggedCorner = e.target.id.replace('corner-', '');
+            
+            document.addEventListener('mousemove', onDrag);
+            document.addEventListener('touchmove', onDrag);
+            document.addEventListener('mouseup', stopDrag);
+            document.addEventListener('touchend', stopDrag);
+        }
+        
+        function onDrag(e) {
+            if (!draggedCorner) return;
+            e.preventDefault();
+            
+            const rect = preview.getBoundingClientRect();
+            const touch = e.touches ? e.touches[0] : e;
+            
+            const x = ((touch.clientX - rect.left) / rect.width) * 100;
+            const y = ((touch.clientY - rect.top) / rect.height) * 100;
+            
+            corners[draggedCorner].x = Math.max(0, Math.min(100, x));
+            corners[draggedCorner].y = Math.max(0, Math.min(100, y));
+            
+            updateGridOverlay();
+        }
+        
+        function stopDrag() {
+            draggedCorner = null;
+            document.removeEventListener('mousemove', onDrag);
+            document.removeEventListener('touchmove', onDrag);
+            document.removeEventListener('mouseup', stopDrag);
+            document.removeEventListener('touchend', stopDrag);
+        }
+        
+        function updateGridOverlay() {
+            document.getElementById('corner-tl').setAttribute('cx', corners.tl.x);
+            document.getElementById('corner-tl').setAttribute('cy', corners.tl.y);
+            document.getElementById('corner-tr').setAttribute('cx', corners.tr.x);
+            document.getElementById('corner-tr').setAttribute('cy', corners.tr.y);
+            document.getElementById('corner-bl').setAttribute('cx', corners.bl.x);
+            document.getElementById('corner-bl').setAttribute('cy', corners.bl.y);
+            document.getElementById('corner-br').setAttribute('cx', corners.br.x);
+            document.getElementById('corner-br').setAttribute('cy', corners.br.y);
+            
+            const minX = Math.min(corners.tl.x, corners.bl.x);
+            const maxX = Math.max(corners.tr.x, corners.br.x);
+            const minY = Math.min(corners.tl.y, corners.tr.y);
+            const maxY = Math.max(corners.bl.y, corners.br.y);
+            
+            const rect = document.getElementById('grid-rect');
+            rect.setAttribute('x', minX);
+            rect.setAttribute('y', minY);
+            rect.setAttribute('width', maxX - minX);
+            rect.setAttribute('height', maxY - minY);
+            
+            // Update grid lines
+            const svg = document.querySelector('.grid-overlay svg');
+            const lines = svg.querySelectorAll('line');
+            
+            for (let i = 0; i < 4; i++) {
+                const x = minX + (maxX - minX) * (i + 1) / 5;
+                lines[i].setAttribute('x1', x);
+                lines[i].setAttribute('x2', x);
+                lines[i].setAttribute('y1', minY);
+                lines[i].setAttribute('y2', maxY);
+            }
+            
+            for (let i = 4; i < 8; i++) {
+                const y = minY + (maxY - minY) * (i - 3) / 5;
+                lines[i].setAttribute('y1', y);
+                lines[i].setAttribute('y2', y);
+                lines[i].setAttribute('x1', minX);
+                lines[i].setAttribute('x2', maxX);
+            }
+        }
+        
+        // ==================== IMAGE PROCESSING ====================
+        async function captureAndProcess() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('processing-canvas');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Apply brightness and contrast
+            const brightness = parseInt(document.getElementById('brightness-slider').value);
+            const contrast = parseInt(document.getElementById('contrast-slider').value);
+            
+            ctx.filter = `brightness(${100 + brightness}%) contrast(${contrast}%)`;
+            ctx.drawImage(video, 0, 0);
+            ctx.filter = 'none';
+            
+            // Crop to grid area
+            const croppedCanvas = cropToGrid(canvas);
+            
+            await processImageOCR(croppedCanvas);
+        }
+        
+        function cropToGrid(sourceCanvas) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            const minX = Math.min(corners.tl.x, corners.bl.x) / 100;
+            const maxX = Math.max(corners.tr.x, corners.br.x) / 100;
+            const minY = Math.min(corners.tl.y, corners.tr.y) / 100;
+            const maxY = Math.max(corners.bl.y, corners.br.y) / 100;
+            
+            const cropX = minX * sourceCanvas.width;
+            const cropY = minY * sourceCanvas.height;
+            const cropWidth = (maxX - minX) * sourceCanvas.width;
+            const cropHeight = (maxY - minY) * sourceCanvas.height;
+            
+            canvas.width = cropWidth;
+            canvas.height = cropHeight;
+            
+            ctx.drawImage(sourceCanvas, cropX, cropY, cropWidth, cropHeight, 0, 0, cropWidth, cropHeight);
+            
+            return canvas;
+        }
+        
+        async function uploadImage() {
+            document.getElementById('file-input').click();
+        }
+        
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const img = new Image();
+            img.src = URL.createObjectURL(file);
+            
+            img.onload = async () => {
+                const canvas = document.getElementById('processing-canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                
+                // Apply preprocessing
+                ctx.filter = 'brightness(110%) contrast(120%)';
+                ctx.drawImage(canvas, 0, 0);
+                ctx.filter = 'none';
+                
+                await processImageOCR(canvas);
+            };
+        });
+        
+        async function processImageOCR(canvas) {
+            const progressDiv = document.getElementById('ocr-progress');
+            const progressFill = document.getElementById('progress-fill');
+            const previewContainer = document.getElementById('cells-preview-container');
+            const previewDiv = document.getElementById('cells-preview');
+            
+            progressDiv.style.display = 'block';
+            progressFill.style.width = '10%';
+            progressFill.textContent = 'Splitting grid...';
+            
+            try {
+                const cells = splitGrid(canvas);
+                const numbers = [];
+                const cellImages = [];
+                
+                for (let i = 0; i < cells.length; i++) {
+                    progressFill.style.width = `${10 + (i / cells.length) * 80}%`;
+                    progressFill.textContent = `Processing ${i + 1}/25...`;
+                    
+                    let num;
+                    
+                    // Center cell (index 12) is FREE
+                    if (i === 12) {
+                        num = -1; // FREE marker
+                    } else {
+                        num = await recognizeCell(cells[i]);
+                    }
+                    
+                    numbers.push(num);
+                    cellImages.push(cells[i].toDataURL());
+                }
+                
+                progressFill.style.width = '100%';
+                progressFill.textContent = 'Complete!';
+                
+                // Show preview
+                previewDiv.innerHTML = '';
+                numbers.forEach((num, i) => {
+                    const cell = document.createElement('div');
+                    cell.className = 'preview-cell';
+                    
+                    const img = document.createElement('img');
+                    img.src = cellImages[i];
+                    cell.appendChild(img);
+                    
+                    const numDiv = document.createElement('div');
+                    numDiv.className = 'preview-number';
+                    numDiv.textContent = num === -1 ? 'FREE' : (num || '?');
+                    cell.appendChild(numDiv);
+                    
+                    previewDiv.appendChild(cell);
+                });
+                
+                previewContainer.style.display = 'block';
+                
+                // Auto-confirm after 2 seconds or add manual confirm button
+                setTimeout(() => {
+                    createCardFromNumbers(numbers);
+                    closeCamera();
+                }, 2000);
+                
+            } catch (err) {
+                showToast('OCR failed. Try adjusting alignment.');
+                console.error(err);
+                progressDiv.style.display = 'none';
+            }
+        }
+        
+        function splitGrid(canvas) {
+            const cells = [];
+            const w = canvas.width / 5;
+            const h = canvas.height / 5;
+            
+            for (let y = 0; y < 5; y++) {
+                for (let x = 0; x < 5; x++) {
+                    const temp = document.createElement('canvas');
+                    temp.width = w;
+                    temp.height = h;
+                    
+                    const ctx = temp.getContext('2d');
+                    ctx.drawImage(canvas, x * w, y * h, w, h, 0, 0, w, h);
+                    
+                    // Additional preprocessing per cell
+                    ctx.filter = 'grayscale(100%) contrast(150%)';
+                    ctx.drawImage(temp, 0, 0);
+                    ctx.filter = 'none';
+                    
+                    cells.push(temp);
+                }
+            }
+            
+            return cells;
+        }
+        
+        async function recognizeCell(cell) {
+            try {
+                const result = await Tesseract.recognize(cell, 'eng', {
+                    tessedit_char_whitelist: '0123456789FREfre',
+                    tessedit_pageseg_mode: 7,
+                    tessedit_ocr_engine_mode: 3
+                });
+                
+                const text = result.data.text.trim().toUpperCase();
+                
+                // Check for FREE
+                if (text.includes('FREE') || text.includes('FRE') || text === 'F') {
+                    return -1;
+                }
+                
+                const num = parseInt(text);
+                return (num >= 1 && num <= 75) ? num : 0;
+                
+            } catch (err) {
+                console.error('OCR error:', err);
+                return 0;
+            }
+        }
+        
+        function createCardFromNumbers(numbers) {
+            const card = {
+                id: cardIdCounter++,
+                name: `Scanned ${bingoCards.length + 1}`,
+                numbers: numbers,
+                isWinner: false
+            };
+            
+            bingoCards.push(card);
+            renderCard(card);
+            updateStats();
+            saveState();
+            switchSection('cards');
+            showToast('Card added!');
+        }
+        
+        // ==================== DATA MANAGEMENT ====================
+        function saveState() {
+            const state = {
+                bingoCards,
+                calledNumbers,
+                gameMode,
+                cardIdCounter
+            };
+            localStorage.setItem('bingoState', JSON.stringify(state));
+        }
+        
+        function loadState() {
+            const saved = localStorage.getItem('bingoState');
+            if (!saved) return;
+            
+            try {
+                const state = JSON.parse(saved);
+                bingoCards = state.bingoCards || [];
+                calledNumbers = state.calledNumbers || [];
+                gameMode = state.gameMode || 'fullhouse';
+                cardIdCounter = state.cardIdCounter || 1;
+                
+                // Render all cards
+                bingoCards.forEach(card => renderCard(card));
+                
+                // Display called numbers
+                calledNumbers.forEach(num => displayCalledNumber(num));
+                
+                // Set game mode
+                setGameMode(gameMode);
+                
+                updateStats();
+                checkAllWinners();
+                
+            } catch (err) {
+                console.error('Failed to load state:', err);
+            }
+        }
+        
+        function exportGame() {
+            const state = {
+                bingoCards,
+                calledNumbers,
+                gameMode,
+                timestamp: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `bingo-game-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            
+            showToast('Game exported!');
+        }
+        
+        function importGame() {
+            document.getElementById('json-input').click();
+        }
+        
+        document.getElementById('json-input').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const state = JSON.parse(e.target.result);
+                    
+                    if (confirm('Import will replace current game. Continue?')) {
+                        resetGame();
+                        
+                        bingoCards = state.bingoCards || [];
+                        calledNumbers = state.calledNumbers || [];
+                        gameMode = state.gameMode || 'fullhouse';
+                        
+                        bingoCards.forEach(card => renderCard(card));
+                        calledNumbers.forEach(num => displayCalledNumber(num));
+                        setGameMode(gameMode);
+                        
+                        updateStats();
+                        checkAllWinners();
+                        saveState();
+                        
+                        showToast('Game imported!');
+                    }
+                } catch (err) {
+                    showToast('Invalid file format');
+                    console.error(err);
+                }
+            };
+            reader.readAsText(file);
+        });
+        
+        function resetGame() {
+            if (confirm('Reset entire game? All cards and numbers will be cleared.')) {
+                bingoCards = [];
+                calledNumbers = [];
+                cardIdCounter = 1;
+                currentNumberInput = '';
+                
+                document.getElementById('cards-container').innerHTML = '';
+                document.getElementById('called-numbers').innerHTML = '';
+                document.getElementById('results-list').innerHTML = '';
+                document.getElementById('results-section').style.display = 'none';
+                document.getElementById('current-number').textContent = '--';
+                
+                updateStats();
+                saveState();
+                showToast('Game reset!');
+            }
+        }
+        
+        // ==================== UTILITIES ====================
+        function playSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (err) {
+                console.error('Audio not supported');
+            }
+        }
+        
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 2000);
+        }
+        
+        // ==================== INITIALIZATION ====================
+        loadState();
+        
+        // Brightness/Contrast sliders
+        document.getElementById('brightness-slider').addEventListener('input', updateCameraFilters);
+        document.getElementById('contrast-slider').addEventListener('input', updateCameraFilters);
+        
+        function updateCameraFilters() {
+            const video = document.getElementById('camera-video');
+            const brightness = parseInt(document.getElementById('brightness-slider').value);
+            const contrast = parseInt(document.getElementById('contrast-slider').value);
+            
+            video.style.filter = `brightness(${100 + brightness}%) contrast(${contrast}%)`;
+        }
+    </script>
+</body>
+</html>
